@@ -41,10 +41,14 @@
 </p>
 
 #### Robots
-* Jetbot (differential).
-* Carter V1 (differential).
+* Jetbot      (differential).
+* Carter V1   (differential).
 * Transporter (differential).
-* Kaya (holonomic).
+* Kaya        (holonomic).
+
+<p align="center">
+  <img src="images/robots.gif" alt="robots"/>
+</p>
 
 #### Sensors
 * Wheel lineal velocity sensor (encoder).
