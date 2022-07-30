@@ -75,17 +75,16 @@ You must hace a computer compatible with Isaac Sim 2021.2.1, please check the [o
 ## How to use
 <a name="How-to-use"/>
 
-#### Train
 Open a terminal and run the following commands:
+
+#### To train
  1. cd ~/.local/share/ov/pkg/isaac_sim-2021.2.1/DRL_Isaac_lib/
  2. ~/.local/share/ov/pkg/isaac_sim-2021.2.1/python.sh train_d.py
 
-#### Tensorboard view
-Open a terminal and run:
+#### To view tensorboard
 * ~/.local/share/ov/pkg/isaac_sim-2021.2.1/python.sh ~/.local/share/ov/pkg/isaac_sim-2021.2.1/tensorboard --logdir ./
 
-#### Real-time nvidia-smi
-If you want to watch the GPU ussage in real time run in a terminal:
+#### To Watch nvidia-smi in real time
 * watch -n0.1 nvidia-smi
 
 
