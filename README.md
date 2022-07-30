@@ -65,6 +65,13 @@
 ## How to install
 <a name="How-to-install"/>
 
+#### Requirements
+You must hace a computer compatible with Isaac Sim 2021.2.1, please check the [official documentation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/requirements.html).
+
+#### Steps
+ 1. Download this Git.
+ 2. Copy DRL_Isaac_lib to ~/.local/share/ov/pkg/isaac_sim-2021.2.1
+
 ## How to use
 <a name="How-to-use"/>
 
