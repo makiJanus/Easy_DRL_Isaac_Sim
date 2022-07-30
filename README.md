@@ -36,6 +36,10 @@
 * One floor of an office building.
 * A custom random obstacle map.
 
+<p align="center">
+  <img src="images/scenes.gif" alt="scenes"/>
+</p>
+
 #### Robots
 * Jetbot (differential).
 * Carter V1 (differential).
