@@ -94,6 +94,74 @@ Open a terminal and run the following commands:
 ## Example
 <a name="Example"/>
 
+Three files to train a DQN agent are included to illustrate the usage of the library. These are: 
+* env.py
+* train.py
+* eval.py
+
+The differential robot used is a jetbot. The scene is a random obstacle generator. The goal is to achieve an end position by avoiding different obstacles by utilizing a set of discrete actions. 
+
+```python
+class Isaac_envs(gym.Env):
+    metadata = {"render.modes": ["human"]}
+    
+    ## ...
+
+        from isaac_robots  import isaac_robot
+        from isaac_envs    import isaac_envs  
+        from omni.isaac.core.objects import VisualCuboid
+
+        env_name    = "random_walk"
+        robot_name  = "jetbot"
+        action_type = "discrete"
+        
+    ## ...
+}
+```
+
+If you want to change the robot, scene, or action type, modify the following parameters:
+
+#### env_name =
+* "grid_default"
+* "grid_black"
+* "grid_curved"
+* "simple_room"
+* "warehause_small_A"
+* "warehause_small_B"
+* "warehause_small_C"
+* "warehause_full"
+* "hospital"
+* "office"
+* "random_walk"
+
+
+#### robot_name = 
+* "jetbot"
+* "carter_v1"
+* "kaya"
+* "transporter"
+
+#### action_type = 
+* "continuous"
+* "discrete"
+
+To fast obtain the observation of the environment, the methods created in this work are used:
+
+[code]
+
+The reward function used is:
+
+[code]
+
+And the neural network  is:
+
+[nn]
+
+After 3.000.000 steps, the results are;
+
+[curve]
+[gif]
+
 <p align="justify">
   There is.
 </p>
