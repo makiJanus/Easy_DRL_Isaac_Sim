@@ -174,18 +174,13 @@ def get_observations(self):
 
 The reward function used is:
 
-$$
-\begin{linenomath}
-\begin{align}
-\label{eqn:reward}
-r = \left\{\begin{array}{lll}
--d_{t}  \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if goal isn't achieved} \\
--p  &; \text{if robot collides with the obstacle}\\ 
-r_{l} \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if robot achieves goal}
-\end{array}\right.
-\end{align}
-\end{linenomath}
-$$
+$$r = \left\{ \begin{array}{lll}
+  -d_{t}  \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if goal isn't achieved} \\
+  -p  &; \text{if robot collides with the obstacle}\\ 
+  r_{l} \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if robot achieves goal}
+\end{array}$$
+
+
 
 And the neural network  is:
 
