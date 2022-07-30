@@ -67,7 +67,7 @@
 <a name="How-to-install"/>
 
 #### Requirements
-You must hace a computer compatible with Isaac Sim 2021.2.1, please check the [official documentation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/requirements.html).
+You must have a computer compatible with Isaac Sim 2021.2.1, please check the [official documentation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/requirements.html).
 
 #### Steps
  1. Download this Git.
