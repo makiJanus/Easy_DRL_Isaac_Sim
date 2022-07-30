@@ -116,7 +116,6 @@ class Isaac_envs(gym.Env):
         action_type = "discrete"
         
     ## ...
-}
 ```
 
 If you want to change the robot, scene, or action type, modify the following parameters:
@@ -147,11 +146,46 @@ If you want to change the robot, scene, or action type, modify the following par
 
 To fast obtain the observation of the environment, the methods created in this work are used:
 
-[code]
+```python
+def get_observations(self):
+        ## Camera Data
+        # rgb_data   = self.isaac_environments._get_cam_data(type="rgb") ## Custom method
+        depth_data = self.isaac_environments._get_cam_data(type="depth") ## Custom method
+
+        ## Lidar Data
+        lidar_data = self.isaac_environments._get_lidar_data() ## Custom method
+        # for transporter uncomment the next line
+        # lidar_data2 = self.isaac_environments._get_lidar_data(lidar_selector=2) ## Custom method
+
+        ## Distance and angular differencess
+        goal_world_position, _        = self.goal.get_world_pose()
+        d                             = self.robot.distance_to(goal_world_position) ## Custom method
+        angle                         = self.robot.angular_difference_to(goal_world_position) ## Custom method
+        target_relative_to_robot_data = np.array([ d, angle ])
+
+        ## Robot base's velocities
+        real_V = self.robot.get_lineal_vel_base() ## Custom method
+        real_W = self.robot.get_angular_vel_base() ## Custom method
+
+        vase_vel_data = np.array([ real_V, real_W])
+
+        obs = {"IR_raleted" : lidar_data, "pos_raleted" : target_relative_to_robot_data, "vel_raleted" : vase_vel_data} 
+```
 
 The reward function used is:
 
-[code]
+$$
+\begin{linenomath}
+\begin{align}
+\label{eqn:reward}
+r = \left\{\begin{array}{lll}
+-d_{t}  \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if goal isn't achieved} \\
+-p  &; \text{if robot collides with the obstacle}\\ 
+r_{l} \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if robot achieves goal}
+\end{array}\right.
+\end{align}
+\end{linenomath}
+$$
 
 And the neural network  is:
 
