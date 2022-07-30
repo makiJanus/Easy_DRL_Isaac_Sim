@@ -174,23 +174,32 @@ def get_observations(self):
 
 The reward function used is:
 
-$$r = \left\{ \begin{array}{lll}
-  -d_{t}  \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if goal isn't achieved} \\
-  -p  &; \text{if robot collides with the obstacle}\\ 
-  r_{l} \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if robot achieves goal}
-\end{array}$$
+$$\begin{linenomath}
+\begin{align}
+\label{eqn:reward}
+r = \left\{\begin{array}{lll}
+-d_{t}  \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if goal isn't achieved} \\
+-p  &; \text{if robot collides with the obstacle}\\ 
+r_{l} \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if robot achieves goal}
+\end{array}\right.
+\end{align}
+\end{linenomath}$$
 
+After 3.000.000 steps, the results are:
 
-
-And the neural network  is:
-
-[nn]
-
-After 3.000.000 steps, the results are;
-
-[curve]
-[gif]
-
-<p align="justify">
-  There is.
+<p align="center">
+  <img src="images/DQN_example.jpg" alt="DQN_example"/>
 </p>
+
+<p align="center">
+  <img src="images/DQN_g.gif" alt="DQN_g"/>
+</p>
+
+An evaluation of 30 episodes was made to extract some useful information about the quality of the learned policy $\pi$, the result presented in the next table.
+
+| Parameter        | Value         |
+|------------------|---------------|
+| Rate of success  |  86.7%        |
+| Episode's time   |  27.6 [s]     |
+| Episode's steps  |  1619 [steps] |
+| Robot trajectory |  504.1 [cm]   |
