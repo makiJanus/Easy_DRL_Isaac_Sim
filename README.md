@@ -18,12 +18,14 @@
 - [Example](#Example)
 - [Notes](#Notes)
 
+
 ## Description
 <a name="Description"/>
 
 <p align="justify">
   The library aims to conduct experiments and DRL training with mobile robots in a realistic environment using standard libraries such as OpenAi Gym, Pytorch, Isaac Sim extensions, and SB3 in a unified and ready-to-use framework. Furthermore, the library is easy to use, configure, and customize all different robots, sensors, environments, and methods that allow and facilitate research in AI-based mobile robots using Isaac Sim, speeding up time-consuming steps for training expert agents.
 </p>
+
 
 ## Features
 <a name="Features"/>
@@ -72,6 +74,7 @@ You must hace a computer compatible with Isaac Sim 2021.2.1, please check the [o
  1. Download this Git.
  2. Copy DRL_Isaac_lib to ~/.local/share/ov/pkg/isaac_sim-2021.2.1
 
+
 ## How to use
 <a name="How-to-use"/>
 
@@ -91,9 +94,6 @@ Open a terminal and run the following commands:
 ## Example
 <a name="Example"/>
 
-## Notes
-<a name="Notes"/>
-
 <p align="justify">
-  An easy-to-use library to develop deep reinforcement learning experiments in the Isaac Sim simulator. 
+  There is.
 </p>
