@@ -188,11 +188,13 @@ r_{l} \left ( 1 - \frac{step_i}{step_{max}} \right ) &; \text{if robot achieves 
 After 3.000.000 steps, the results are:
 
 <p align="center">
-  <img src="images/DQN_example.jpg" alt="DQN_example"/>
+  <img src="images/DQN_example.jpg" alt="DQN_example"/
+   div style="width: 50%; height: 50%"/>
 </p>
 
+
 <p align="center">
-  <img src="images/DQN_g.gif" alt="DQN_g"/>
+  <img src="images/DQN_g.gif" alt="DQN_G"/>
 </p>
 
 An evaluation of 30 episodes was made to extract some useful information about the quality of the learned policy $\pi$, the result presented in the next table.
