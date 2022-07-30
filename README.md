@@ -194,7 +194,7 @@ After 3.000.000 steps, the results are:
 
 
 <p align="center">
-  <img src="images/DQN_g.gif" alt="DQN_G"/>
+  <img src="images/DQN_g.gif" alt="DQN_G.gif"/>
 </p>
 
 An evaluation of 30 episodes was made to extract some useful information about the quality of the learned policy $\pi$, the result presented in the next table.
