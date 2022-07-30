@@ -16,7 +16,6 @@
 - [How to install](#How-to-install)
 - [How to use](#How-to-use)
 - [Example](#Example)
-- [Notes](#Notes)
 
 
 ## Description
