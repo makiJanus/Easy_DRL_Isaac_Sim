@@ -2,6 +2,7 @@ from typing import Optional, Tuple
 import numpy as np
 from omni.isaac.core.robots.robot import Robot
 from omni.isaac.core.utils.nucleus import find_nucleus_server
+from omni.isaac.core.utils.nucleus import get_assets_root_path
 from omni.isaac.core.utils.prims import get_prim_at_path, define_prim
 from omni.isaac.dynamic_control import _dynamic_control
 from gym import spaces
@@ -28,9 +29,9 @@ class isaac_robot(Robot):
         orientation: Optional[np.ndarray] = None,
     ) -> None:
 
-        self._name      = name
+        self._name = name
         self._prim_path = prim_path
-        self.dc         = _dynamic_control.acquire_dynamic_control_interface()
+        self.dc = _dynamic_control.acquire_dynamic_control_interface()
         self._is_differential = True
 
         if name=="jetbot":
@@ -45,17 +46,23 @@ class isaac_robot(Robot):
         elif name=="transporter":
             usd_path = "/Isaac/Robots/Transporter/transporter_sensors.usd"
             self._is_differential = True
+        elif name=="quadcopter":
+            usd_path = "/Isaac/Robots/Quadcopter/quadcopter.usd"
         else:
             carb.log_error("Could not find robot :(")
         
         prim = get_prim_at_path(prim_path)
         if not prim.IsValid():
             prim = define_prim(prim_path, "Xform")
-            result, nucleus_server = find_nucleus_server()
+            """ result, nucleus_server = find_nucleus_server()
             if result is False:
                 carb.log_error("Could not find nucleus server with /Isaac folder")
+                return """
+            self.nucleus_server = get_assets_root_path()
+            if self.nucleus_server is None:
+                carb.log_error("Could not find nucleus server with /Isaac folder")
                 return
-            asset_path = nucleus_server + usd_path #"/Isaac/Robots/Jetbot/jetbot.usd" "/Isaac/Robots/Carter/carter_v1.usd"
+            asset_path = self.nucleus_server + usd_path #"/Isaac/Robots/Jetbot/jetbot.usd" "/Isaac/Robots/Carter/carter_v1.usd"
             prim.GetReferences().AddReference(asset_path)
         super().__init__(
             prim_path=prim_path, name=name, position=position, orientation=orientation, articulation_controller=None
@@ -72,6 +79,9 @@ class isaac_robot(Robot):
         #     self._wheel_dof_indices = (5, 6)
         elif self._name == "kaya":
             self._wheel_dof_names = ["axle_2_joint", "axle_1_joint", "axle_0_joint"] # [left, right, back]
+            self._wheel_dof_indices = (0, 1, 2)
+        elif self._name == "quadcopter":
+            self._wheel_dof_names = ["rotor_0", "rotor_1", "rotor_2"] # [left, right, back]
             self._wheel_dof_indices = (0, 1, 2)
 
         return
@@ -130,7 +140,7 @@ class isaac_robot(Robot):
         wheel_base   = 5
 
         if self._name == "jetbot":
-            wheel_radius = 3 
+            wheel_radius = 3.25 
             wheel_base   = 11.25
         elif self._name == "carter_v1":
             wheel_radius = 24.5 
