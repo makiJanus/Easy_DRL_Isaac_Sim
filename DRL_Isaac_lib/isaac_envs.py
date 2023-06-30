@@ -15,12 +15,14 @@ class isaac_envs():
     ) -> None:
         from omni.isaac.core import World
         from omni.isaac.core.utils.nucleus import find_nucleus_server
+        from omni.isaac.core.utils.nucleus import get_assets_root_path
         from omni.isaac.range_sensor import _range_sensor
 
         # Basic world prims
-        self._my_world = World(physics_dt=physics_dt, rendering_dt=rendering_dt, stage_units_in_meters=0.01)
-        result, self.nucleus_server = find_nucleus_server()
-        if result is False:
+        self._my_world = World(physics_dt=physics_dt, rendering_dt=rendering_dt, stage_units_in_meters=1)
+        #result, self.nucleus_server = find_nucleus_server('/Isaac')
+        self.nucleus_server = get_assets_root_path()
+        if self.nucleus_server is None:
             carb.log_error("Could not find nucleus server with /Isaac folder")
             return
         
@@ -28,8 +30,8 @@ class isaac_envs():
         self.sd_helper = None
         self._lidar_path  = ""
         self._lidar_path2 = ""
-        # self._map_dimension = 5
-        # self._map_dist_unit = 50
+        #self._map_dimension = 5
+        #self._map_dist_unit = 50
 
         self.stage = omni.usd.get_context().get_stage()
         self.lidarInterface = _range_sensor.acquire_lidar_sensor_interface()
@@ -105,7 +107,9 @@ class isaac_envs():
             camera_path = prim_path+"/camera_mount/transporter_camera_first_person"
 
         if headless:
-            viewport_handle = omni.kit.viewport.get_viewport_interface()
+            #viewport_handle = omni.kit.viewport.get_viewport_interface()
+            viewport_handle = omni.kit.viewport.utility.get_active_viewport() #changed
+
             viewport_handle.get_viewport_window().set_active_camera(str(camera_path))
             viewport_window = viewport_handle.get_viewport_window()
             self.viewport_window = viewport_window
@@ -120,11 +124,17 @@ class isaac_envs():
                 transform.Set(mat)
             
         else:
-            viewport_handle = omni.kit.viewport.get_viewport_interface().create_instance()
-            new_viewport_name = omni.kit.viewport.get_viewport_interface().get_viewport_window_name(viewport_handle)
-            viewport_window = omni.kit.viewport.get_viewport_interface().get_viewport_window(viewport_handle)
-            viewport_window.set_active_camera(camera_path)
-            viewport_window.set_texture_resolution(size[0], size[1])
+            #viewport_handle = omni.kit.viewport.get_viewport_interface().create_instance()
+            #new_viewport_name = omni.kit.viewport.get_viewport_interface().get_viewport_window_name(viewport_handle)
+            #viewport_window = omni.kit.viewport.get_viewport_interface().get_viewport_window(viewport_handle)
+            viewport_handle = omni.kit.viewport.utility.get_active_viewport()
+            new_viewport_name = omni.kit.viewport.utility.get_active_viewport_camera_string(viewport_handle)
+            viewport_window = omni.kit.viewport.utility.get_active_viewport_window(new_viewport_name)
+
+            #viewport_window.set_active_camera(camera_path)
+            viewport_window.camera_path = camera_path
+            #viewport_window.set_texture_resolution(size[0], size[1])
+            viewport_window.resolution = (size[0], size[1])
             
             if name=="kaya":
                 xform = UsdGeom.Xformable(camera_prim)
@@ -134,11 +144,12 @@ class isaac_envs():
                 mat.SetRotateOnly(Gf.Rotation(Gf.Vec3d(1,0,0), 70))
                 transform.Set(mat)
             
-            viewport_window.set_window_size(420, 420)
-            self.viewport_window = viewport_window
+            #viewport_window.set_window_size(420, 420)
+            #self.viewport_window = viewport_window
+            self.viewport_window = viewport_handle
         
         self.sd_helper = SyntheticDataHelper()
-        self.sd_helper.initialize(sensor_names=["depth", "rgb"], viewport=self.viewport_window)
+        self.sd_helper.initialize(sensor_names=["depth", "rgb"], viewport_api=self.viewport_window)
         self._my_world.render()
         self.sd_helper.get_groundtruth(["depth", "rgb"], self.viewport_window)
         return
@@ -181,7 +192,7 @@ class isaac_envs():
             max_range = 1
         
         else:
-            carb.log_error("Could not find the selected sensor, maybe there is a lidar already in this robot :p")
+            carb.log_error("Could not find the selected sensor, maybe there is a lidar already in this robot")
             return
 
         if headless:
@@ -214,7 +225,8 @@ class isaac_envs():
         self._my_world.render()
         if type=="depth":
              gt = self.sd_helper.get_groundtruth(["depth"], self.viewport_window, verify_sensor_init=False, wait_for_sensor_data=0)
-             img = gt["depth"][:, :, :1]
+             #img = gt["depth"][:, :, :1]
+             img = gt["depth"][:, :]
         else:
             gt = self.sd_helper.get_groundtruth(["rgb"], self.viewport_window, verify_sensor_init=False, wait_for_sensor_data=0)
             img = gt["rgb"][:, :, :3]
@@ -237,16 +249,16 @@ class isaac_envs():
         from pxr import UsdGeom
 
         if name=="jetbot" or name=="kaya":
-            map_dist_unit=50
-            height = 20
+            map_dist_unit=0.5#50
+            height = 0.2#20
 
         if name=="carter_v1":
-            map_dist_unit=110
-            height = 70
+            map_dist_unit=1.1
+            height = 0.7
         
         if name=="transporter":
-            map_dist_unit=130
-            height = 40
+            map_dist_unit=1.3
+            height = 0.4
         
         self._map_dimension = map_dimension
         self._map_dist_unit = map_dist_unit
@@ -256,7 +268,8 @@ class isaac_envs():
                 prim_path="/outer_wall_1",
                 name="wall_1",
                 position=np.array([map_dist_unit*(map_dimension-1)/2, -map_dist_unit*(map_dimension-2), height/2]),
-                size=np.array([map_dist_unit*(map_dimension+2), map_dist_unit, height]),
+                size=1,
+                scale=np.array([map_dist_unit*(map_dimension+2), map_dist_unit, height]), #size
                 color=np.array([0.3, 0.5, 0.3]),
             )
         )
@@ -265,7 +278,8 @@ class isaac_envs():
                 prim_path="/outer_wall_2",
                 name="wall_2",
                 position=np.array([-map_dist_unit*2, map_dist_unit*(map_dimension-1)/2, height/2]),
-                size=np.array([map_dist_unit, map_dist_unit*(map_dimension+2+4), height]),
+                size=1,
+                scale=np.array([map_dist_unit, map_dist_unit*(map_dimension+2+4), height]), #size
                 color=np.array([0.3, 0.5, 0.3]),
             )
         )
@@ -274,8 +288,9 @@ class isaac_envs():
                 prim_path="/outer_wall_3",
                 name="wall_3",
                 position=np.array([map_dist_unit*(map_dimension+1), map_dist_unit*(map_dimension-1)/2, height/2]),
-                size=np.array([map_dist_unit, map_dist_unit*(map_dimension+2+4), height]),
-                color=np.array([0.3, 0.5, 0.3]),
+                size=1,
+                scale=np.array([map_dist_unit, map_dist_unit*(map_dimension+2+4), height]), #size
+                color=np.array([0.3, 0.5, 0.3]), 
             )
         )
         self.outer_wall_4 = self._my_world.scene.add(
@@ -283,7 +298,8 @@ class isaac_envs():
                 prim_path="/outer_wall_4",
                 name="wall_4",
                 position=np.array([map_dist_unit*(map_dimension-1)/2, map_dist_unit*(map_dimension+2), height/2]),
-                size=np.array([map_dist_unit*(map_dimension+2), map_dist_unit, height]),
+                size=1,
+                scale=np.array([map_dist_unit*(map_dimension+2), map_dist_unit, height]), #size
                 color=np.array([0.3, 0.5, 0.30]),
             )
         )
@@ -292,7 +308,7 @@ class isaac_envs():
         self.stage = omni.usd.get_context().get_stage()
 
         self.cuboid_T = {}
-        i             = 0
+        i = 0
         for row in range(map_dimension):
             for column in range(map_dimension):
                 self._my_world.scene.add(
@@ -300,7 +316,8 @@ class isaac_envs():
                         prim_path="/wall_cube_"+str(row)+str(column),
                         name="cube_"+str(row)+str(column),
                         position=np.array([row*map_dist_unit, column*map_dist_unit, height/2]),
-                        size=np.array([map_dist_unit, map_dist_unit, height]),
+                        size=1,
+                        scale=np.array([map_dist_unit, map_dist_unit, height]), #size
                         color=np.array([0.3, 0.3, 0.3]),))
                 cube_row_column = self.stage.GetPrimAtPath("/wall_cube_"+str(row)+str(column))
                 xform = UsdGeom.Xformable(cube_row_column)
@@ -309,13 +326,13 @@ class isaac_envs():
             i += 1
         return
 
-    def _generate_map(self, max_n_tunel=40, max_length_tunel=3, random = True):
+    def _generate_map(self, max_n_tunel = 40, max_length_tunel = 3, random = True):
         from pxr import Gf
         # Reference: https://www.freecodecamp.org/news/how-to-make-your-own-procedural-dungeon-map-generator-using-the-random-walk-algorithm-e0085c8aa9a/
         map = np.ones((self._map_dimension, self._map_dimension))
         pos = np.random.randint(10, size=2)
         #map[pos[0], pos[1]] = 0
-        n_tunel      = 0
+        n_tunel = 0
         length_tunel = 0
         direction = [[-1, 0],
                      [1 , 0], 
@@ -373,7 +390,7 @@ class isaac_envs():
         mapita_aux = np.zeros((2, self._map_dimension))
         mapita_core = np.rot90(self._generate_map(random=random), axes=(1,0))
         no_path = True
-        flag    = False
+        flag = False
 
         while no_path and random:
             for row in range (self._map_dimension):
@@ -391,23 +408,23 @@ class isaac_envs():
     
     def _robot_pose_random_walk(self,random: bool = False):
         if random:
-            position = np.array([self._map_dist_unit * np.random.randint(self._map_dimension), self._map_dist_unit * (-1.5), 2.5])
+            position = np.array([self._map_dist_unit * np.random.randint(self._map_dimension), self._map_dist_unit * (-1.5), 0])
             # randomize robot orientation expressed in quaternions with cosine-sine trick to constraint rotation in one axis and make the final vector's magnitude equal to 1
             # ref: https://eater.net/quaternions/video/intro
-            a  = np.random.rand()*np.pi # junt pi instead of 2*pi 'cause the angle in doubled in quaternion aplication
+            a  = np.random.rand()*np.pi # junt pi instead of 2*pi 'cause the angle in doubled in quaternion application
             q1 = np.sin(a)*0 # x axis?
             q2 = np.sin(a)*0 # y axis?
             q3 = np.sin(a)   # z axis?
             q4 = np.cos(a)   # 4th dim axis?
             orientation = np.array([q1, q2, q3, q4])
         else:
-            position=np.array([self._map_dist_unit * (self._map_dimension-1)/2, self._map_dist_unit * (-1.5), 2.5])
+            position=np.array([self._map_dist_unit * (self._map_dimension-1)/2, self._map_dist_unit * (-1.5), 0])
             orientation = np.array([1.0, 0.0, 0.0, 0.0])
         return position, orientation
 
     def _target_pos_random_walk(self, random: bool = False):
         if random:
-            position=np.array([self._map_dist_unit * np.random.randint(self._map_dimension), self._map_dist_unit * (5.5), 2.5])
+            position=np.array([self._map_dist_unit * np.random.randint(self._map_dimension), self._map_dist_unit * (5.5), 0.25])
         else:
-            position=np.array([self._map_dist_unit * (self._map_dimension-1)/2, self._map_dist_unit * (5.5), 2.5])
+            position=np.array([self._map_dist_unit * (self._map_dimension-1)/2, self._map_dist_unit * (5.5), 0.25])
         return position
